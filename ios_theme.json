@@ -1,0 +1,88 @@
+{
+    "theme": {
+        "name": "iOS Dark",
+        "colors": {
+            "bg": {
+                "primary": "linear-gradient(135deg, #1a1d29 0%, #2d3142 100%)",
+                "secondary": "rgba(45, 49, 66, 0.6)",
+                "card": "rgba(255, 255, 255, 0.08)"
+            },
+            "text": {
+                "primary": "#e8ecf1",
+                "secondary": "#b8bcc8",
+                "tertiary": "#8a8f9e"
+            },
+            "glass": {
+                "background": "rgba(255, 255, 255, 0.08)",
+                "border": "rgba(255, 255, 255, 0.15)",
+                "shadow": "0 8px 32px 0 rgba(0, 0, 0, 0.4)",
+                "blur": "12px"
+            },
+            "pastel": {
+                "blue": "#6ba3c5",
+                "lightBlue": "#8bb8d4",
+                "green": "#7bc4a8",
+                "lightGreen": "#9ad4be",
+                "pink": "#d98a95",
+                "lightPink": "#e5a5af",
+                "purple": "#9a8ec4",
+                "lightPurple": "#b5a9d8",
+                "yellow": "#d4c88a",
+                "lightYellow": "#e5dca5",
+                "orange": "#d4a876",
+                "lightOrange": "#e5be91",
+                "red": "#d98a95",
+                "lightRed": "#e5a5af"
+            },
+            "charts": {
+                "recovery": {
+                    "low": "#d98a95",
+                    "medium": "#d4c88a",
+                    "high": "#34C759"
+                },
+                "strain": {
+                    "primary": "#00E6C8",
+                    "gradient": [
+                        "#00E6C8",
+                        "#34C759"
+                    ]
+                },
+                "endurance": {
+                    "recreational": "#d98a95",
+                    "intermediate": "#d4a876",
+                    "trained": "#d4c88a",
+                    "wellTrained": "#9ad4be",
+                    "expert": "#7bc4a8",
+                    "superior": "#00E6C8",
+                    "elite": "#34C759"
+                },
+                "hrv": {
+                    "line": "#00E6C8",
+                    "baseline": "#34C759",
+                    "fill": "rgba(0, 230, 200, 0.15)"
+                },
+                "sleep": {
+                    "primary": "#00E6C8",
+                    "secondary": "#34C759"
+                },
+                "heatmap": {
+                    "low": "#1a2a28",
+                    "medium": "#00E6C8",
+                    "high": "#34C759"
+                }
+            }
+        },
+        "effects": {
+            "backdropFilter": "blur(12px)",
+            "borderRadius": "20px",
+            "transition": "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
+        },
+        "typography": {
+            "fontFamily": "-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif",
+            "fontWeightLight": 300,
+            "fontWeightRegular": 400,
+            "fontWeightMedium": 500,
+            "fontWeightBold": 600
+        }
+    }
+}
