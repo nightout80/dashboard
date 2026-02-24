@@ -4,6 +4,7 @@ service_account.json
 credentials.json
 google_tokens.json
 .env
+engelberg_2026.csv
 
 # --- Python ---
 __pycache__/
