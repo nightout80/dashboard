@@ -14,6 +14,7 @@ export default defineConfig({
         proxy: {
             '/dashboard': 'http://localhost:8000',
             '/design-tokens': 'http://localhost:8000',
+            '/boxplot': 'http://localhost:8000',
         }
     }
 })

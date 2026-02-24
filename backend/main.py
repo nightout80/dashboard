@@ -38,5 +38,20 @@ def get_design_tokens():
             return json.load(f)
     return {"error": "design_tokens.json not found"}
 
+@app.get("/boxplot")
+def get_boxplot(
+    metric: str = "pace",
+    segmentation: str = "week",
+    startDate: str = None,
+    endDate: str = None,
+    runType: str = None,
+    sportType: str = None
+):
+    try:
+        data = logic.get_boxplot_data(metric, segmentation, startDate, endDate, runType, sportType)
+        return data
+    except Exception as e:
+        return {"error": str(e)}
+
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

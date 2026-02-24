@@ -431,3 +431,114 @@ def determine_recommendation(vitals, load, plan):
         "text": rec_text,
         "action": action
     }
+
+def get_boxplot_data(metric="pace", segmentation="week", start_date=None, end_date=None, run_type=None, sport_type=None):
+    """
+    Calculates boxplot statistics for the requested metric and segmentation.
+    Metric: 'pace' or 'hr'
+    Segmentation: 'week' or 'run_type'
+    """
+    # 1. Load Data
+    df_g2 = data_loader.load_sheet_data(SPREADSHEET_ID, "Garmin2!A:ZZ")
+    df_aw = data_loader.load_sheet_data(SPREADSHEET_ID, "All_Workouts!A:AZ")
+    
+    if df_g2.empty or df_aw.empty:
+        return {"error": "Could not load data from sheets"}
+    
+    # 2. Join Data
+    # all_workouts.id == Garmin2.Strava_ID
+    # Check if columns exist
+    if 'Strava_ID' not in df_g2.columns:
+        return {"error": f"Column 'Strava_ID' not found in Garmin2. Available: {df_g2.columns.tolist()[:10]}..."}
+    if 'id' not in df_aw.columns:
+        return {"error": f"Column 'id' not found in All_Workouts. Available: {df_aw.columns.tolist()[:10]}..."}
+
+    df_aw['id'] = df_aw['id'].astype(str).str.strip()
+    df_g2['Strava_ID'] = df_g2['Strava_ID'].astype(str).str.strip()
+    
+    merged = pd.merge(df_g2, df_aw, left_on='Strava_ID', right_on='id', how='inner', suffixes=('', '_aw'))
+    
+    if merged.empty:
+        return {"error": "No data found after joining activities"}
+
+    # 3. Clean and Parse
+    # Parse Date
+    merged['Date_Parsed'] = pd.to_datetime(merged['start_date'], dayfirst=True, errors='coerce')
+    
+    # helper to clean HR and Pace (e.g. "359,61" -> 359.61)
+    def clean_numeric(val):
+        if not val or val == '':
+            return np.nan
+        try:
+            return float(str(val).replace(',', '.'))
+        except:
+            return np.nan
+
+    merged['HR_Numeric'] = merged['Avg HR'].apply(clean_numeric)
+    # Pace_Raw is already seconds (or numeric equivalent) but with comma
+    merged['Pace_Seconds'] = merged['Pace_Raw'].apply(clean_numeric)
+
+    # 4. Filter
+    if start_date:
+        start_ts = pd.to_datetime(start_date)
+        merged = merged[merged['Date_Parsed'] >= start_ts]
+    if end_date:
+        end_ts = pd.to_datetime(end_date)
+        merged = merged[merged['Date_Parsed'] <= end_ts]
+    
+    if run_type and run_type != 'all':
+        # Spalte activity_type_display_name in All_Workouts (joined as activity_type_display_name)
+        merged = merged[merged['activity_type_display_name'] == run_type]
+    
+    if sport_type and sport_type != 'all':
+        # Spalte type in All_Workouts
+        merged = merged[merged['type'] == sport_type]
+
+    # Drop NaNs for the target metric
+    target_col = 'Pace_Seconds' if metric == 'pace' else 'HR_Numeric'
+    filtered = merged.dropna(subset=[target_col])
+    
+    if filtered.empty:
+        return {"data": [], "message": "No data available for selected filters"}
+
+    # 5. Segment
+    if segmentation == 'week':
+        filtered['group'] = filtered['Date_Parsed'].dt.isocalendar().week
+        label_prefix = "KW "
+    else:
+        filtered['group'] = filtered['activity_type_display_name']
+        label_prefix = ""
+
+    # 6. Calculate Boxplot Stats
+    def get_stats(group):
+        q1 = group[target_col].quantile(0.25)
+        median = group[target_col].quantile(0.5)
+        q3 = group[target_col].quantile(0.75)
+        mi = group[target_col].min()
+        ma = group[target_col].max()
+        
+        return pd.Series({
+            'min': float(mi),
+            'q1': float(q1),
+            'median': float(median),
+            'q3': float(q3),
+            'max': float(ma),
+            'count': int(len(group))
+        })
+
+    result = filtered.groupby('group').apply(get_stats).reset_index()
+    
+    # Format labels
+    result['label'] = result['group'].apply(lambda x: f"{label_prefix}{x}")
+    
+    # Sort
+    if segmentation == 'week':
+        result = result.sort_values('group')
+    
+    return {
+        "metric": metric,
+        "segmentation": segmentation,
+        "data": result.to_dict(orient='records'),
+        "available_run_types": merged['activity_type_display_name'].dropna().unique().tolist(),
+        "available_sport_types": merged['type'].dropna().unique().tolist()
+    }

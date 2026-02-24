@@ -13,6 +13,7 @@ import HRVTrendChart from './components/HRVTrendChart'
 import StyleToggle from './components/StyleToggle'
 import DistanceSpiderChart from './components/DistanceSpiderChart'
 import DailyDistanceSpiderChart from './components/DailyDistanceSpiderChart'
+import BoxplotChart from './components/BoxplotChart'
 
 // Simple Error Boundary
 // ... (ErrorBoundary code remains same) ...
@@ -275,6 +276,18 @@ function InnerApp({ data, onRefresh, isRefreshing }) {
                     ) : (
                         <div className="text-gray-500">Not enough data.</div>
                     )}
+                </div>
+            </section>
+
+            {/* Boxplot Section */}
+            <h2 className="text-2xl font-bold mb-4 mt-8" style={{ color: designTokens.theme.colors.text.primary }}>Performance Distribution</h2>
+            <section className="mb-8">
+                <div
+                    className={isIOS ? 'glass-card p-6' : 'p-6 rounded-xl'}
+                    style={{ backgroundColor: isIOS ? 'transparent' : designTokens.theme.colors.bg.card }}
+                >
+                    <h3 className="text-lg font-bold mb-4" style={{ color: designTokens.theme.colors.text.secondary }}>Pace & Herzfrequenz Analyse</h3>
+                    <BoxplotChart />
                 </div>
             </section>
 
