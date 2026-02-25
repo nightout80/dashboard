@@ -335,13 +335,29 @@ function App() {
     const fetchData = async () => {
         try {
             if (!data) setLoading(true); // Only show full loading on first load
-            const res = await fetch('/dashboard');
+            const res = await fetch('/api/dashboard');
+
+            if (!res.ok) {
+                const text = await res.text();
+                console.error(`Dashboard Fetch Error: ${res.status}`, text.substring(0, 100));
+                setData({ error: `Server returned ${res.status}: ${text.substring(0, 50)}...` });
+                return;
+            }
+
+            const contentType = res.headers.get("content-type");
+            if (!contentType || !contentType.includes("application/json")) {
+                const text = await res.text();
+                console.error("Dashboard Non-JSON response:", text.substring(0, 100));
+                setData({ error: `Expected JSON, but got: ${text.substring(0, 50)}...` });
+                return;
+            }
+
             const json = await res.json();
             console.log("Dashboard Data:", json);
             setData(json);
         } catch (err) {
             console.error("Fetch Error:", err);
-            // Optionally set data.error if strict
+            setData({ error: `Network Error: ${err.message}` });
         } finally {
             setLoading(false);
             setIsRefreshing(false);

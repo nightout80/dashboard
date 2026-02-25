@@ -1,0 +1,13 @@
+[Unit]
+Description=Whoop Dashboard API
+After=network.target
+
+[Service]
+User=pi
+WorkingDirectory=/home/pi/Whoop/backend
+ExecStart=/usr/bin/python3 main.py
+Restart=always
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=multi-user.target

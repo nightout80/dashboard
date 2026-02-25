@@ -21,7 +21,7 @@ import logic
 def read_root():
     return {"status": "ok", "message": "Whoop-Style Dashboard API is running"}
 
-@app.get("/dashboard")
+@app.get("/api/dashboard")
 def get_dashboard():
     try:
         data = logic.get_dashboard_data()
@@ -29,7 +29,7 @@ def get_dashboard():
     except Exception as e:
         return {"error": str(e)}
 
-@app.get("/design-tokens")
+@app.get("/api/design-tokens")
 def get_design_tokens():
     # Load from parent directory
     token_path = os.path.join(os.path.dirname(__file__), "..", "design_tokens.json")
@@ -38,7 +38,7 @@ def get_design_tokens():
             return json.load(f)
     return {"error": "design_tokens.json not found"}
 
-@app.get("/boxplot")
+@app.get("/api/boxplot")
 def get_boxplot(
     metric: str = "pace",
     segmentation: str = "week",
