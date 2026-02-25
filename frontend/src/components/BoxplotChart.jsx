@@ -46,6 +46,17 @@ const BoxplotChart = () => {
             if (endDate) params.append('endDate', endDate);
 
             const res = await fetch(`/boxplot?${params.toString()}`);
+            
+            // Check if response is JSON
+            const contentType = res.headers.get("content-type");
+            if (!contentType || !contentType.includes("application/json")) {
+                const text = await res.text();
+                console.error("Non-JSON response received:", text.substring(0, 100));
+                setError(`Server returned ${res.status} (${res.statusText}). Check your Proxy/Nginx configuration.`);
+                setLoading(false);
+                return;
+            }
+
             const json = await res.json();
 
             if (json.error) {
@@ -57,7 +68,7 @@ const BoxplotChart = () => {
                 setError(null);
             }
         } catch (err) {
-            setError(err.message);
+            setError(`Network Error: ${err.message}`);
         } finally {
             setLoading(false);
         }
